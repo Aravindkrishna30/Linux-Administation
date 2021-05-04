@@ -1,0 +1,153 @@
+
+*********************Move or migrate single user accounts from old Linux server to a new Linux server***************************
+
+Following files/dirs are required for traditional Linux user management:
+
+* /etc/passwd – contains various pieces of information for each user account
+
+* /etc/shadow – contains the encrypted password information for user’s accounts and optional the password aging information.
+
+* /etc/group – defines the groups to which users belong
+
+* /etc/gshadow – group shadow file (contains the encrypted password for group)
+
+* /var/spool/mail – Generally user emails are stored here.
+
+* /home – All Users data is stored here.
+
+___________________________________________________
+Note:  <>      It denotes the particular argument
+       //      Comments
+      //...//  Note
+__________________________________________________
+
+-----------------------------------------------
+
+Users Requirement:
+
+**Source or Old Server Useradd**
+
+// Ensure that you don't have any user in destination server have same UID and GID, what you move from source server. 
+If you have like that please change UID and GID in  source server user.//
+
+If create new user then:
+  # useradd -u 2000 <username> krishna //adduser with modifid UID
+       where -u -> Userid
+       
+(or)
+
+If you already have user then :
+  # usermod -u 20000 <username> krishna //modifies the UID
+
+  # groupmod -g 2000 <group name> krishna //modifies the GID
+ 
+  # cat/etc/passwd  //check the file 
+-------------------------------------
+
+**Destination or New Server Useradd**
+
+If create new user then:
+  # useradd <username> aravind //adduser
+
+// If you work in AWS or any cloud platform you need to configure user & Password//
+For AWS:
+
+  # vi /etc/ssh/sshd_config
+
+        Permitrootlogin yes (change No-> Yes)
+
+        Passwordauthentication yes
+         (remove the #)
+        #Passwordauthentication No
+         (add the #)
+------------------------------
+
+1. Restart the sshd service:
+     # systemctl restart sshd
+
+2. Status of the sshd service:
+     # systemctl status sshd
+-----------------------------
+
+___________________________________________________________________________________________________________________________
+
+//You need to backup all of the above files and directories from old server to new Linux server.//
+
+Commands to type on old Linux system:
+
+  1. Check UID & GID of User
+      # id<user> krishna
+      
+  2. Now copy /etc/passwd accounts to /root/move/passwd.mig:
+      # cat /etc/passwd | grep <UID> 2000 > /root/move/passwd.mig
+      
+  3. Copy /etc/group file:
+      # cat /etc/group | grep <GID> 2000 > /root/move/group.mig
+      
+  4. Copy /etc/shadow file:
+      # cat /etc/shadow | grep <username> krishna > /root/move/shadow.mig
+      
+  5. Copy /etc/gshadow (rarely used):
+      # cat /etc/gshadow | grep <username> krishna > /root/move/gshadow.mig
+      
+  6. Make a backup of /home and /var/spool/mail dirs:
+      # tar -zcvpf /root/move/home.tar.gz /home/<username> krishna         //Make a backup of users /home dir//
+      # tar -zcvpf /root/move/home.tar.gz /var/spool/<username> krishna   //Make a backup of users mail dir//
+           where,
+              -z -> Zip archive
+              -c -> Create new archive
+              -v -> Varbose
+              -p -> Preserve permission
+              -f -> Filename or archive
+    
+  7. Create the destination folder in that user home directory in destination or new linux machine:
+         # mkdir /home/aravind/userbackup
+          
+         # pwd //see the path
+          
+  7.1. Take copy of the path:
+           /home/aravind/userbackup
+              
+  8. Use scp or usb pen or tape to copy /root/move to a new Linux system:
+        # scp -r /root/move/* aravind@172.31.4.244: /home/aravind/userbackup
+         
+             syntax: # scp -r /source/location/* user@new.linuxserver.com:/path/to/location
+                where, 
+                   -r -> Option is dir passwd to ssh
+-----------------------------------
+
+________________________________________________________________________________________________________________________________
+  
+Commands to type on new Linux system:
+
+  1. First, make a backup of current users and passwords:
+       # mkdir /root/newsusers.bak
+       
+       # cp /etc/passwd /etc/shadow /etc/group /etc/gshadow /root/newsusers.bak
+       
+  2. Now restore passwd and other files in /etc/ :
+       # cd /path/to/location
+       # cat passwd.mig >> /etc/passwd
+       # cat group.mig >> /etc/group
+       # cat shadow.mig >> /etc/shadow
+       # cat gshadow.mig >> /etc/gshadow
+    Note: Please note that you must use >> (append) and not > (create) shell redirection.
+    
+  3. Now copy and extract home.tar.gz to new server /home
+       # cd /
+       # tar -zxvf /path/to/location/home.tar.gz
+   
+  4. Now copy and extract mail.tar.gz (Mails) to new server /var/spool/mail
+      # cd /
+      # tar -zxvf /path/to/location/mail.tar.gz
+      
+  5. Now reboot system; when the Linux comes back, your user accounts will work as they did before on old system:
+      # reboot
+      
+_____________________________________________________< END >________________________________________________________________________
+
+    
+    
+          
+      
+
