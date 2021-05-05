@@ -34,6 +34,8 @@ If create new user then:
   # useradd -u 2000 <username> krishna //adduser with modifid UID
        where -u -> Userid
        
+  # groupmod -g 2000 <group name> krishna //modifies the GID
+       
 (or)
 
 If you already have user then :
