@@ -73,7 +73,7 @@ For AWS:
 
 ___________________________________________________________________________________________________________________________
 
-//You need to backup all of the above files and directories from old server to new Linux server.//
+//You need to backup all of the above files and directories for that user from old server to new Linux server.//
 
 Commands to type on old Linux system:
 
