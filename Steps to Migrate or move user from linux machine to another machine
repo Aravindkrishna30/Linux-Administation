@@ -41,7 +41,7 @@ If you already have user then :
 
   # groupmod -g 2000 <group name> krishna //modifies the GID
  
-  # cat/etc/passwd  //check the file 
+  # cat/etc/passwd  //check the user along GID & UID 
 -------------------------------------
 
 **Destination or New Server Useradd**
