@@ -111,7 +111,7 @@ Commands to type on old Linux system:
            /home/aravind/userbackup
               
   8. Use scp or usb pen or tape to copy /root/move to a new Linux system:
-        # scp -r /root/move/* aravind@172.31.4.244: /home/aravind/userbackup
+        # scp -r /root/move/* aravind@172.31.4.244:/home/aravind/userbackup
          
              syntax: # scp -r /source/location/* user@new.linuxserver.com:/path/to/location
                 where, 
